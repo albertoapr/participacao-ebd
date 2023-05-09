@@ -109,7 +109,9 @@ public class Participacao {
 	}
 	
 	public String [][] getParametros(){
-		String [][] parametros = new String [13][2];
+		String [][] parametros = new String [15][2];
+		
+		
 		parametros[0][0] = "categoria_id";  
 		parametros[0][1] = this.getIdCategoria();
 		
@@ -137,17 +139,23 @@ public class Participacao {
 		parametros[8][0] = "funcao";  
 		parametros[8][1] = "";
 		
-		parametros[9][0] = "nome";  
-		parametros[9][1] = this.getParticipante().getNome();
+		parametros[9][0] = "funcao_id";  
+		parametros[9][1] = this.getParticipante().getFuncao();
 		
-		parametros[10][0] = "trabalho_id";  
-		parametros[10][1] = this.getIdTrabalho();
+		parametros[10][0] = "nome";  
+		parametros[10][1] = this.getParticipante().getNome();
 		
-		parametros[11][0] = "uf";  
-		parametros[11][1] = "RJ";
+		parametros[11][0] = "trabalho_id";
+		parametros[11][1] = this.getParticipante().getTrabalho();
 		
-		parametros[12][0] = "ebd_id";  
-		parametros[12][1] = this.getEbd().getId();
+		parametros[12][0] = "uf";  
+		parametros[12][1] = "RJ";
+		
+		parametros[13][0] = "ebd_id";  
+		parametros[13][1] = this.getEbd().getId();
+		
+		parametros[14][0] = "aceite_termo";  
+		parametros[14][1] = "1";
 		
 		return parametros;
 	}
@@ -195,7 +203,7 @@ public  byte[] montaParametros() {
 	try {
 	Map<String,Object> params = new LinkedHashMap<String, Object>();
         
-	for (int i = 0; i <= 12; i++) {
+	for (int i = 0; i <= 14; i++) {
 		if (parametros[i][1] != null)
 			params.put(parametros[i][0],parametros[i][1]);
 	}

@@ -90,7 +90,8 @@ public class ParticipacaoEBD {
 		
 		EBD ebd = new EBD(json);
 		participacao.setEbd(ebd);
-		participacao.setIdTrabalho("21");
+		
+		//provavelmente membro da igreja com cpf cadastrado
 		participacao.setIdCategoria("2");
 		participacao.setContribuicao(textoParticipacao);
         
@@ -103,10 +104,12 @@ public class ParticipacaoEBD {
 	   for (Participante participante:participantes) 
 	   {
 		   participacao.setParticipante(participante);
-		 //  resultado = participacao.enviar();
-		   total++;
-		   System.out.println(participante.getNome()+": participação enviada ");
-		 //  System.out.println(participante.getNome()+": "+ URLDecoder.decode(resultado, "UTF-8"));
+		   resultado = participacao.enviar();
+		   if (resultado.contains("Sucesso"))
+			   total++;
+		   System.out.println(participante.getNome()+": "+ resultado);
+		   resultado = "";
+		   
 	   }
 		
 	   System.out.println(total+" participações enviadas, pressione ESC para sair");
