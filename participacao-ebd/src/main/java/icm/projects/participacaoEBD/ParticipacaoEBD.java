@@ -1,23 +1,30 @@
 package icm.projects.participacaoEBD;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.opencsv.bean.CsvToBeanBuilder;
 
 import icm.projects.participacaoEBD.modelo.*;
 import icm.projects.participacaoEBD.util.JsonReader;
+import icm.projects.participacaoEBD.util.TxtReader;
 
 public class ParticipacaoEBD {
 
@@ -34,6 +41,8 @@ public class ParticipacaoEBD {
 	    }	
 	    return texto;
 	}
+	
+	 
 	
 	
 	public static String getFilePath(String fileName) {
@@ -76,16 +85,55 @@ public class ParticipacaoEBD {
 	                 
 	  		
 	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static List<Participante> carregaParticipantesFromUrl(String csvUrl) throws IllegalStateException, UnsupportedEncodingException {
+		
+			URL url ;
+			BufferedReader reader;
+        
+	        List<Participante> participantes = null;
+			try {
+				url = new URL(csvUrl);
+				reader = new BufferedReader(new InputStreamReader(url.openStream()));
+				participantes = new CsvToBeanBuilder(reader)
+		                .withType(Participante.class)
+		                .build()
+		                .parse();
+				return participantes;
+			}  catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return null;
+	                 
+	  		
+	}
 	
 
 	public static void main (String[] args) throws IOException {
 		
 		String resultado = null;
-		System.out.println("Buscando EBD ...");
-		JSONObject json = JsonReader.readJsonFromUrl("https://intregracao-site.presbiterio.org.br/api-ebd/parametros");
-		String textoParticipacao = lerArquivo("respostas.txt");
+		
+		
+		String urlEBD = "https://intregracao-site.presbiterio.org.br/api-ebd/parametros";
+		String urlResposta  = "https://docs.google.com/document/export?format=txt&id=1c2CyPDuJB87XmnTchLR2PFqfSjqNzCy32jozXYfu7O8";
+		String urlParticipantes = "https://docs.google.com/spreadsheets/d/1zCY9DtKMQPF5s_YHXaM0TGFi8YKNdZdQja_22GnUeZQ/export?format=csv&id=1zCY9DtKMQPF5s_YHXaM0TGFi8YKNdZdQja_22GnUeZQ&gid=532508908";
+		
+		
+		
+		System.out.println("Carregando dados da EBD ...");
+		JSONObject json = JsonReader.readJsonFromUrl(urlEBD);
+		
+		System.out.println("Carregando respostas ...");
+		//String textoParticipacao = lerArquivo("respostas.txt");
+		String textoParticipacao = TxtReader.readTxtFromUrl(urlResposta);
+		
 		System.out.println("Carregando participates ...");
-		ArrayList<Participante> participantes =  (ArrayList<Participante>) carregaParticipantes("participantes.csv");
+	
+		//ArrayList<Participante> participantes =  (ArrayList<Participante>) carregaParticipantes("participantes.csv");
+		ArrayList<Participante> participantes =  (ArrayList<Participante>) carregaParticipantesFromUrl(urlParticipantes);
+		
 		Participacao participacao = new Participacao();
 		
 		EBD ebd = new EBD(json);
