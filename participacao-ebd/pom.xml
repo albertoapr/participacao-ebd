@@ -7,9 +7,17 @@
 	<version>1</version>
 	<name>participacao ebd</name>
 	<description>Envio de participacao ebd da icm</description>
-	<dependencies>
+	
+    
+    
+     <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+    <dependencies>
 	<dependency>
-    <groupId>org.json</groupId>
+	<groupId>org.json</groupId>
     <artifactId>json</artifactId>
     <version>20210307</version>
 </dependency>
@@ -24,6 +32,38 @@
 			<artifactId>opencsv</artifactId>
 			<version>5.3</version>
 		</dependency>
-	</dependencies>
+	
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.8.6</version>
+        </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-lambda-java-core</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>2.3</version>
+                <configuration>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
