@@ -110,57 +110,52 @@ public class ParticipacaoEBD {
 	  		
 	}
 	
-
+public static String enviarParticipacoes(String urlResposta, String urlParticipantes) throws IOException{
+	
+	String retorno = "";
+	String resultado = "";
+	
+	String urlEBD = "https://intregracao-site.presbiterio.org.br/api-ebd/parametros";
+	JSONObject json = JsonReader.readJsonFromUrl(urlEBD);
+	String textoParticipacao = TxtReader.readTxtFromUrl(urlResposta);
+	ArrayList<Participante> participantes =  (ArrayList<Participante>) carregaParticipantesFromUrl(urlParticipantes);
+	
+	Participacao participacao = new Participacao();
+	EBD ebd = new EBD(json);
+	participacao.setEbd(ebd);
+	
+	//provavelmente membro da igreja com cpf cadastrado
+	participacao.setIdCategoria("2");
+	participacao.setContribuicao(textoParticipacao);
+    
+	
+   
+  //Aqui enviamos a mesma participação para cada um 
+  //dos participantes que ajudaram na montagem das respostas
+	System.out.println("Enviando participações ...");
+	int total = 0;
+   for (Participante participante:participantes) 
+   {
+	   participacao.setParticipante(participante);
+	   resultado = participacao.enviar();
+	   if (resultado.contains("Sucesso"))
+		   total++;
+	   retorno  += participante.getNome()+": "+ resultado +"\n";
+	   resultado = "";
+	   
+   }
+   retorno += total +" participações enviados";
+	
+   
+	
+	return retorno;
+}
 	public static void main (String[] args) throws IOException {
 		
-		String resultado = null;
-		
-		
-		String urlEBD = "https://intregracao-site.presbiterio.org.br/api-ebd/parametros";
 		String urlResposta  = "https://docs.google.com/document/export?format=txt&id=1c2CyPDuJB87XmnTchLR2PFqfSjqNzCy32jozXYfu7O8";
 		String urlParticipantes = "https://docs.google.com/spreadsheets/d/1zCY9DtKMQPF5s_YHXaM0TGFi8YKNdZdQja_22GnUeZQ/export?format=csv&id=1zCY9DtKMQPF5s_YHXaM0TGFi8YKNdZdQja_22GnUeZQ&gid=532508908";
 		
-		
-		
-		System.out.println("Carregando dados da EBD ...");
-		JSONObject json = JsonReader.readJsonFromUrl(urlEBD);
-		
-		System.out.println("Carregando respostas ...");
-		//String textoParticipacao = lerArquivo("respostas.txt");
-		String textoParticipacao = TxtReader.readTxtFromUrl(urlResposta);
-		
-		System.out.println("Carregando participates ...");
-	
-		//ArrayList<Participante> participantes =  (ArrayList<Participante>) carregaParticipantes("participantes.csv");
-		ArrayList<Participante> participantes =  (ArrayList<Participante>) carregaParticipantesFromUrl(urlParticipantes);
-		
-		Participacao participacao = new Participacao();
-		
-		EBD ebd = new EBD(json);
-		participacao.setEbd(ebd);
-		
-		//provavelmente membro da igreja com cpf cadastrado
-		participacao.setIdCategoria("2");
-		participacao.setContribuicao(textoParticipacao);
-        
-		
-	   
-	  //Aqui enviamos a mesma participação para cada um 
-	  //dos participantes que ajudaram na montagem das respostas
-		System.out.println("Enviando participações ...");
-		int total = 0;
-	   for (Participante participante:participantes) 
-	   {
-		   participacao.setParticipante(participante);
-		   resultado = participacao.enviar();
-		   if (resultado.contains("Sucesso"))
-			   total++;
-		   System.out.println(participante.getNome()+": "+ resultado);
-		   resultado = "";
-		   
-	   }
-		
-	   System.out.println(total+" participações enviadas, pressione ESC para sair");
+	   System.out.println(enviarParticipacoes(urlResposta,urlParticipantes));
 
 	}
 }
