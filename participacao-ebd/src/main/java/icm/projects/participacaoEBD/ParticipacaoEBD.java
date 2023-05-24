@@ -85,6 +85,7 @@ public class ParticipacaoEBD {
 	                 
 	  		
 	}
+    
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static List<Participante> carregaParticipantesFromUrl(String csvUrl) throws IllegalStateException, UnsupportedEncodingException {
@@ -100,6 +101,17 @@ public class ParticipacaoEBD {
 		                .withType(Participante.class)
 		                .build()
 		                .parse();
+				
+				//remove a 1ª linha com o nome dos campos da planilha
+				if (participantes.get(0).getCpf().toUpperCase().equals("CPF"))
+					participantes.remove(0);
+				//pega o email e o telefone na api do presbiterio se por acaso email e telefone estiver em branco
+				for (Participante participante : participantes) {
+					if (participante.getEmail().isEmpty() || participante.getTelefone().isEmpty())
+						participante.atualizar();
+				}
+				
+					
 				return participantes;
 			}  catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -110,23 +122,21 @@ public class ParticipacaoEBD {
 	  		
 	}
 	
-public static String enviarParticipacoes(String urlResposta, String urlParticipantes) throws IOException{
+public static String enviarParticipacoes(String urlEBD,String urlResposta, String urlParticipantes) throws IOException{
 	
 	String retorno = "";
 	String resultado = "";
-	
-	String urlEBD = "https://intregracao-site.presbiterio.org.br/api-ebd/parametros";
-	JSONObject json = JsonReader.readJsonFromUrl(urlEBD);
+		
+	EBD ebd = carregaEBDfromUrl(urlEBD);
 	String textoParticipacao = TxtReader.readTxtFromUrl(urlResposta);
 	ArrayList<Participante> participantes =  (ArrayList<Participante>) carregaParticipantesFromUrl(urlParticipantes);
 	
-	Participacao participacao = new Participacao();
-	EBD ebd = new EBD(json);
-	participacao.setEbd(ebd);
+	Participacao participacao = new Participacao(ebd);
+	participacao.setContribuicao(textoParticipacao);
 	
 	//provavelmente membro da igreja com cpf cadastrado
 	participacao.setIdCategoria("2");
-	participacao.setContribuicao(textoParticipacao);
+	
     
 	
    
@@ -150,12 +160,32 @@ public static String enviarParticipacoes(String urlResposta, String urlParticipa
 	
 	return retorno;
 }
-	public static void main (String[] args) throws IOException {
+	public static EBD carregaEBDfromUrl(String urlEBD) {
+		JSONObject json;
+		EBD ebd =null;
+		try {
+			json = JsonReader.readJsonFromUrl(urlEBD);
+			ebd = new EBD(json);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
+	return ebd;
+}
+
+
+
+
+	public static void main (String[] args) throws IOException {
+		String urlEBD = "https://intregracao-site.presbiterio.org.br/api-ebd/parametros";
 		String urlResposta  = "https://docs.google.com/document/export?format=txt&id=1c2CyPDuJB87XmnTchLR2PFqfSjqNzCy32jozXYfu7O8";
 		String urlParticipantes = "https://docs.google.com/spreadsheets/d/1zCY9DtKMQPF5s_YHXaM0TGFi8YKNdZdQja_22GnUeZQ/export?format=csv&id=1zCY9DtKMQPF5s_YHXaM0TGFi8YKNdZdQja_22GnUeZQ&gid=532508908";
 		
-	   System.out.println(enviarParticipacoes(urlResposta,urlParticipantes));
+	   System.out.println(enviarParticipacoes(urlEBD,urlResposta,urlParticipantes));
 
 	}
 }

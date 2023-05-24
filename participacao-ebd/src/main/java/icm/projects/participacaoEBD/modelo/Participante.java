@@ -1,8 +1,17 @@
 package icm.projects.participacaoEBD.modelo;
 
+import java.io.IOException;
+
 import com.opencsv.bean.CsvBindByPosition;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import icm.projects.participacaoEBD.util.JsonReader;
+
 public class Participante {
+	private final String URL_CPF = "https://intregracao-site.presbiterio.org.br/api-ebd/consultacpf/";
 	@CsvBindByPosition(position = 0)	
 	String nome;
 
@@ -76,6 +85,38 @@ Participante (String nome,String cpf, String telefone, String email,String funca
 	
 }
 
+/*
+ * Atualiza nome, email e celular do participantes consultanto no presbitério*/
+public void atualizar() {
+	
+	
+	String urlConculta = URL_CPF + this.getCpf() ;
+	
+	try {
+		JSONObject json = JsonReader.readJsonFromUrl(urlConculta);
+		this.setNome(json.getString("nome"));
+        this.setEmail(json.getString("email"));
+        this.setTelefone(json.getString("celular"));
+       /* 
+        this.setPastor(json.getString("pastor"));
+        this.setIgreja(json.getString("igreja"));
+        this.setCidade(json.getString("cidade"));
+        this.setUf(json.getString("uf"));
+   */
+		
+		
+	} catch (JSONException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+		
+	}
+	
+       
+	
+}
 
 
 

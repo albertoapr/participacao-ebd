@@ -18,9 +18,10 @@ public class enviarParticipacaoEBD implements RequestStreamHandler{
         JsonObject responseBody = new JsonObject();
         JsonObject headerJson = new JsonObject();
         
+        String urlEBD = "https://intregracao-site.presbiterio.org.br/api-ebd/parametros";
         String urlResposta  = "https://docs.google.com/document/export?format=txt&id=1c2CyPDuJB87XmnTchLR2PFqfSjqNzCy32jozXYfu7O8";
 		String urlParticipantes = "https://docs.google.com/spreadsheets/d/1zCY9DtKMQPF5s_YHXaM0TGFi8YKNdZdQja_22GnUeZQ/export?format=csv&id=1zCY9DtKMQPF5s_YHXaM0TGFi8YKNdZdQja_22GnUeZQ&gid=532508908";
-		String resultadoDoEnvio =  ParticipacaoEBD.enviarParticipacoes(urlResposta,urlParticipantes);
+		String resultadoDoEnvio =  ParticipacaoEBD.enviarParticipacoes(urlEBD,urlResposta,urlParticipantes);
 
         //propriedade mensagem na resposta
         responseBody.addProperty("message", resultadoDoEnvio);

@@ -29,6 +29,11 @@ public class Participacao {
 		// TODO Auto-generated constructor stub
 	}
 
+	public Participacao(EBD ebd) {
+		super();
+		this.setEbd(ebd);
+		// TODO Auto-generated constructor stub
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
