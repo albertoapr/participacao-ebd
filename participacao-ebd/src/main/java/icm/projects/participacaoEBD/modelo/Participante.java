@@ -1,8 +1,14 @@
 package icm.projects.participacaoEBD.modelo;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.util.List;
 
 import com.opencsv.bean.CsvBindByPosition;
+import com.opencsv.bean.CsvToBeanBuilder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -86,7 +92,7 @@ Participante (String nome,String cpf, String telefone, String email,String funca
 }
 
 /*
- * Atualiza nome, email e celular do participantes consultanto no presbitério*/
+ * Atualiza nome, email e celular do participantes consultanto no presbitï¿½rio*/
 public void atualizar() {
 	
 	
@@ -187,6 +193,41 @@ public void setTrabalho(String trabalho) {
 
 public String getTrabalho() {
 	return trabalho;
+}
+
+@SuppressWarnings({ "unchecked", "rawtypes" })
+public static List<Participante> carregaParticipantesFromUrl(String csvUrl) throws IllegalStateException, UnsupportedEncodingException {
+	
+		URL url ;
+		BufferedReader reader;
+    
+        List<Participante> participantes = null;
+		try {
+			url = new URL(csvUrl);
+			reader = new BufferedReader(new InputStreamReader(url.openStream()));
+			participantes = new CsvToBeanBuilder(reader)
+	                .withType(Participante.class)
+	                .build()
+	                .parse();
+			
+			//remove a 1ï¿½ linha com o nome dos campos da planilha
+			if (participantes.get(0).getCpf().toUpperCase().equals("CPF"))
+				participantes.remove(0);
+			//pega o email e o telefone na api do presbiterio se por acaso email e telefone estiver em branco
+			for (Participante participante : participantes) {
+				if (participante.getEmail().isEmpty() || participante.getTelefone().isEmpty())
+					participante.atualizar();
+			}
+			
+				
+			return participantes;
+		}  catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+                 
+  		
 }
 
 

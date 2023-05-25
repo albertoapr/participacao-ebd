@@ -1,191 +1,21 @@
 package icm.projects.participacaoEBD;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.io.IOUtils;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import com.opencsv.bean.CsvToBeanBuilder;
-
-import icm.projects.participacaoEBD.modelo.*;
-import icm.projects.participacaoEBD.util.JsonReader;
-import icm.projects.participacaoEBD.util.TxtReader;
+import icm.projects.participacaoEBD.modelo.Igreja;
 
 public class ParticipacaoEBD {
-
-
-	public static String lerArquivo(String pathFile) throws IOException
-	{
-		 String texto =null;
-		String arquivo = getFilePath(pathFile); 
-		FileInputStream inputStream = new FileInputStream(arquivo);
-	    try {
-	         texto = IOUtils.toString(inputStream);
-	    } finally {
-	        inputStream.close();
-	    }	
-	    return texto;
-	}
-	
-	 
-	
-	
-	public static String getFilePath(String fileName) {
-		  // Determine where the input file is; assuming it's in the same directory as the jar
-        
-        File jarFile;
-        
-		try {
-			jarFile = new File(ParticipacaoEBD.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
-			String inputFilePath = URLDecoder.decode(jarFile.getParent(), "UTF-8") + File.separator + fileName;
-			
-			return inputFilePath;
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-		
-	}
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static List<Participante> carregaParticipantes(String arquivoParticipantes) throws IllegalStateException, UnsupportedEncodingException {
-		
-	        // Determine where the input file is; assuming it's in the same directory as the jar
-	        List<Participante> participantes = null;
-			try {
-				String inputFilePath = getFilePath(arquivoParticipantes);
-				participantes = new CsvToBeanBuilder(new FileReader(inputFilePath))
-		                .withType(Participante.class)
-		                .build()
-		                .parse();
-				return participantes;
-			}  catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			return null;
-	                 
-	  		
-	}
-    
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static List<Participante> carregaParticipantesFromUrl(String csvUrl) throws IllegalStateException, UnsupportedEncodingException {
-		
-			URL url ;
-			BufferedReader reader;
-        
-	        List<Participante> participantes = null;
-			try {
-				url = new URL(csvUrl);
-				reader = new BufferedReader(new InputStreamReader(url.openStream()));
-				participantes = new CsvToBeanBuilder(reader)
-		                .withType(Participante.class)
-		                .build()
-		                .parse();
-				
-				//remove a 1� linha com o nome dos campos da planilha
-				if (participantes.get(0).getCpf().toUpperCase().equals("CPF"))
-					participantes.remove(0);
-				//pega o email e o telefone na api do presbiterio se por acaso email e telefone estiver em branco
-				for (Participante participante : participantes) {
-					if (participante.getEmail().isEmpty() || participante.getTelefone().isEmpty())
-						participante.atualizar();
-				}
-				
-					
-				return participantes;
-			}  catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			return null;
-	                 
-	  		
-	}
-	
-public static String enviarParticipacoes(String urlEBD,String urlResposta, String urlParticipantes) throws IOException{
-	
-	String retorno = "";
-	String resultado = "";
-		
-	EBD ebd = carregaEBDfromUrl(urlEBD);
-	String textoParticipacao = TxtReader.readTxtFromUrl(urlResposta);
-	ArrayList<Participante> participantes =  (ArrayList<Participante>) carregaParticipantesFromUrl(urlParticipantes);
-	
-	Participacao participacao = new Participacao(ebd);
-	participacao.setContribuicao(textoParticipacao);
-	
-	//provavelmente membro da igreja com cpf cadastrado
-	participacao.setIdCategoria("2");
-	
-    
-	
-   
-  //Aqui enviamos a mesma participação para cada um 
-  //dos participantes que ajudaram na montagem das respostas
-	System.out.println("Enviando participações ...");
-	int total = 0;
-   for (Participante participante:participantes) 
-   {
-	   participacao.setParticipante(participante);
-	   resultado = participacao.enviar();
-	   if (resultado.contains("Sucesso"))
-		   total++;
-	   retorno  += participante.getNome()+": "+ resultado +"\n";
-	   resultado = "";
-	   
-   }
-   retorno += total +" participações enviados";
-	
-   
-	
-	return retorno;
-}
-	public static EBD carregaEBDfromUrl(String urlEBD) {
-		JSONObject json;
-		EBD ebd =null;
-		try {
-			json = JsonReader.readJsonFromUrl(urlEBD);
-			ebd = new EBD(json);
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-	return ebd;
-}
-
-
-
+    public static void processarEnvio() throws IllegalStateException, IOException {
+    	String urlIgreja = "https://docs.google.com/spreadsheets/d/1qlEHTzsmAWxsCrOfflpYgEE9tS2Mtp1UElvxOhXshl0/export?format=csv&id=1qlEHTzsmAWxsCrOfflpYgEE9tS2Mtp1UElvxOhXshl0&gid=0";
+		List<Igreja> igrejas = new ArrayList<Igreja>(Igreja.carregaIgrejaFromUrl(urlIgreja));
+		for (Igreja igreja:igrejas)
+			igreja.enviarParticipacoes();
+    }
 
 	public static void main (String[] args) throws IOException {
-		String urlEBD = "https://intregracao-site.presbiterio.org.br/api-ebd/parametros";
-		String urlResposta  = "https://docs.google.com/document/export?format=txt&id=1c2CyPDuJB87XmnTchLR2PFqfSjqNzCy32jozXYfu7O8";
-		String urlParticipantes = "https://docs.google.com/spreadsheets/d/1zCY9DtKMQPF5s_YHXaM0TGFi8YKNdZdQja_22GnUeZQ/export?format=csv&id=1zCY9DtKMQPF5s_YHXaM0TGFi8YKNdZdQja_22GnUeZQ&gid=532508908";
 		
-	   System.out.println(enviarParticipacoes(urlEBD,urlResposta,urlParticipantes));
+		processarEnvio();
 
 	}
 }

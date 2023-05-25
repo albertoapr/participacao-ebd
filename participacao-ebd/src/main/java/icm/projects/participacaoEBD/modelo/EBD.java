@@ -1,18 +1,22 @@
 package icm.projects.participacaoEBD.modelo;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
+
+import icm.projects.participacaoEBD.util.JsonReader;
 
 public class EBD {
 	private String id;
 	private Date data;
 	private String titulo;
-	String enderecoDeEnvio = "https://intregracao-site.presbiterio.org.br/api-ebd/cadastro-contribuicao";
+	String enderecoDeEnvio = "";
 
 	
 	private Date stringToDate(String data) {
@@ -68,6 +72,21 @@ public class EBD {
 		super();
 		this.carregaEBD(json);
 		// TODO Auto-generated constructor stub
+	}
+	
+	public EBD(Igreja igreja) {
+		super();
+		try {
+				this.carregaEBD(JsonReader.readJsonFromUrl(igreja.getUrlEbd()));
+				this.setEnderecoDeEnvio(igreja.getUrlApiContribuicao());
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	
 	}
 	
 	public EBD() {
