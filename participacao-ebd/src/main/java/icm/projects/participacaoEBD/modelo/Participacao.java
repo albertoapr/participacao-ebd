@@ -185,9 +185,12 @@ public  String enviar () {
 
 	            if (responseCode == 200) {
 	                InputStream inputStr = connection.getInputStream();
-	                String encoding = connection.getContentEncoding() == null ? "UTF-8"
-	                        : connection.getContentEncoding();
+	                String encoding = 
+	                connection.getContentEncoding() == null ? "UTF-8" : connection.getContentEncoding();
+	                
 	               jsonResponse = IOUtils.toString(inputStr, encoding);
+	               
+	               
 	          
 	            }
 	            else
