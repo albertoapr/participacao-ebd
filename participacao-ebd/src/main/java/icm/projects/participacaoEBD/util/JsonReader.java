@@ -33,4 +33,15 @@ public class JsonReader {
       is.close();
     }
   }
+  
+  public static String getMessage(String json) {
+	  try {
+		  JSONObject jsonObject = new JSONObject(json);
+		  String message = jsonObject.getString("message");
+		  return message;
+	  }catch(Exception e) {
+		  return "Erro: "+ json;
+	  }
+	  
+  }
 }
