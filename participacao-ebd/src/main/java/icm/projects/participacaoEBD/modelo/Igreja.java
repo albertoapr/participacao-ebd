@@ -10,10 +10,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.json.JSONObject;
+
 import com.opencsv.bean.CsvBindByPosition;
 import com.opencsv.bean.CsvToBeanBuilder;
 
 import icm.projects.participacaoEBD.util.EmailSender;
+import icm.projects.participacaoEBD.util.JsonReader;
 import icm.projects.participacaoEBD.util.TxtReader;
 
 public class Igreja {
@@ -181,6 +184,11 @@ public class Igreja {
 	   {
 		   participacao.setParticipante(participante);
 		   resultado = participacao.enviar();
+		   
+		   resultado = JsonReader.getMessage(resultado);
+		   
+		   
+		   //resultado = "Sucesso";
 		   if (resultado.contains("Sucesso"))
 		   {
 			   if (!participante.getEmail().isEmpty()) {
@@ -190,7 +198,8 @@ public class Igreja {
 			   total++;
 		   }
 		   
-		   if (participante.getFuncao()!="9")
+		   //Se não for membro comum recebe email com log do processamento
+		   if (!participante.getFuncao().equals("9"))
 			   mailListAdm.add(participante.getEmail());
 		   
 		   System.out.println(participante.getNome()+": "+ resultado);
@@ -198,7 +207,7 @@ public class Igreja {
 		   resultado = "";
 		   
 	   }
-	   retorno += total +" participações enviados";
+	   retorno += total +" participações enviadas";
 	   String emails [] = mailList.toArray(new String[0]);
 	   EmailSender.sendEmail(emails,"Sua participação da EBD foi enviada",textoParticipacao,this.getEmail(),this.getSenha());
 	   emails = mailListAdm.toArray(new String[0]);
