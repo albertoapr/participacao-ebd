@@ -10,4 +10,4 @@ e ser uma ferramenta para edificação espiritual daqueles que querem servir a D
 Caso seja membro de alguma igreja e tenha interesse em participar do projeto entre em contato no email albert.prodrigues@gmail.com . 
 A Paz do Senhor Jesus Cristo.
 
-“Examinais as escrituras, porque cuidais ter nelas a vida eterna, e são elas que de mim testificam.” João 5.39
+“Examinais as escrituras, porque cuidais ter nelas a vida eterna, e são elas que de mim testificam.” João 5.39.
